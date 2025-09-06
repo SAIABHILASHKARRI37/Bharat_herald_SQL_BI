@@ -64,3 +64,12 @@ SELECT
 FROM city_drops
 ORDER BY drop_amount DESC
 LIMIT 3;
+
+## Business Request – 2: Yearly Revenue Concentration by Category 
+Identify ad categories that contributed > 50% of total yearly ad revenue. 
+Fields: 
+• year 
+• category_name 
+• category_revenue  
+• total_revenue_year  
+• pct_of_year_total
