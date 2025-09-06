@@ -114,7 +114,7 @@ FROM efficiency
 ORDER BY efficiency_rank_2024
 LIMIT 5;
 ```
-###4️⃣ Internet Readiness Growth (2021)
+### 4️⃣ Internet Readiness Growth (2021)
 ```sql
 -- 4)
 WITH q1 AS (
