@@ -63,3 +63,32 @@ SELECT
 FROM city_drops
 ORDER BY drop_amount DESC
 LIMIT 3;
+```
+### 2️⃣ Yearly Revenue Concentration by Category
+```sql
+WITH yearly_revenue AS (
+  SELECT
+    YEAR(far.date) AS year,
+    dac.category_name,
+    SUM(far.ad_revenue_in_inr) AS category_revenue
+  FROM fact_ad_revenue far
+  JOIN dim_ad_category dac ON far.ad_category_id = dac.ad_category_id
+  GROUP BY YEAR(far.date), dac.category_name
+),
+total_revenue AS (
+  SELECT
+    year,
+    SUM(category_revenue) AS total_revenue_year
+  FROM yearly_revenue
+  GROUP BY year
+)
+SELECT
+  yr.year,
+  yr.category_name,
+  yr.category_revenue,
+  tr.total_revenue_year,
+  ROUND(yr.category_revenue * 100.0 / tr.total_revenue_year, 2) AS pct_of_year_total
+FROM yearly_revenue yr
+JOIN total_revenue tr ON yr.year = tr.year
+WHERE (yr.category_revenue * 1.0 / tr.total_revenue_year) > 0.5
+ORDER BY yr.year, pct_of_year_total DESC;
