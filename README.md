@@ -305,3 +305,49 @@ SELECT
     engagement_rank_asc
 FROM engagement
 ORDER BY engagement_rank_asc;
+```
+📊 Insights Summary
+
+# Business Request 1 – Circulation Drop
+
+- Varanasi faced the sharpest month-over-month decline in Jan 2021 (↓59,807 copies).
+
+- Varanasi again showed the second-highest drop in Nov 2019 (↓55,649 copies).
+
+- Jaipur ranked third with a decline in Jan 2020 (↓54,681 copies).
+
+# Business Request 2 – Revenue Concentration
+
+- No single ad category exceeded 50% of yearly revenue during 2019–2024.
+
+- The maximum share was Government (35.54%) in 2019.
+
+- Most years’ top categories contributed 30–35% of yearly totals.
+
+# Business Request 3 – Print Efficiency (2024)
+
+- Top 5 cities: Ranchi (0.9064), Ahmedabad (0.9058), Jaipur (0.8987), Varanasi (0.8981), Patna (0.8964).
+
+- Ranchi leads with 90.64% print efficiency.
+
+# Business Request 4 – Internet Readiness Growth (2021)
+
+- Kanpur saw the highest improvement (+2.5).
+
+- Mumbai & Ahmedabad showed strong gains.
+
+- Jaipur showed no growth; Ranchi & Bhopal declined.
+
+# Business Request 5 – Multi-Year Decline (2019–2024)
+
+- Ahmedabad, Bhopal, Delhi, Kanpur, Mumbai → consistent declines in both circulation & ad revenue.
+
+- Other cities declined in circulation but maintained or grew revenues.
+
+# Business Request 6 – Readiness vs Engagement Outlier (2021)
+
+- Kanpur had the highest readiness score (75.23, Rank #1).
+
+- However, its digital pilot engagement ranked among the bottom platforms.
+
+-  This makes Kanpur the clear outlier.
