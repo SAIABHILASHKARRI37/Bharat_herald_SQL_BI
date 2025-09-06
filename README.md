@@ -66,53 +66,94 @@ LIMIT 3;
 ```
 ### 2️⃣ Yearly Revenue Concentration by Category
 ```sql
-WITH yearly_revenue AS (
-  SELECT
-    YEAR(far.date) AS year,
-    dac.category_name,
-    SUM(far.ad_revenue_in_inr) AS category_revenue
-  FROM fact_ad_revenue far
-  JOIN dim_ad_category dac ON far.ad_category_id = dac.ad_category_id
-  GROUP BY YEAR(far.date), dac.category_name
+WITH yearly_totals AS (
+    SELECT 
+        year,
+        SUM(ad_revenue_in_inr) AS total_revenue_year
+    FROM fact_ad_revenue
+    GROUP BY year
 ),
-total_revenue AS (
-  SELECT
-    year,
-    SUM(category_revenue) AS total_revenue_year
-  FROM yearly_revenue
-  GROUP BY year
+category_revenue AS (
+    SELECT 
+        f.year,
+        d.standard_ad_category AS category_name,
+        SUM(f.ad_revenue_in_inr) AS category_revenue,
+        y.total_revenue_year,
+        ROUND(
+            (SUM(f.ad_revenue_in_inr) * 100.0 / y.total_revenue_year), 2
+        ) AS pct_of_year_total
+    FROM fact_ad_revenue f
+    JOIN dim_ad_category d 
+        ON f.ad_category = d.ad_category_id
+    JOIN yearly_totals y
+        ON f.year = y.year
+    GROUP BY f.year, d.standard_ad_category, y.total_revenue_year
+),
+ranked AS (
+    SELECT 
+        year,
+        category_name,
+        category_revenue,
+        total_revenue_year,
+        pct_of_year_total,
+        RANK() OVER (PARTITION BY year ORDER BY category_revenue DESC) AS category_rank
+    FROM category_revenue
 )
-SELECT
-  yr.year,
-  yr.category_name,
-  yr.category_revenue,
-  tr.total_revenue_year,
-  ROUND(yr.category_revenue * 100.0 / tr.total_revenue_year, 2) AS pct_of_year_total
-FROM yearly_revenue yr
-JOIN total_revenue tr ON yr.year = tr.year
-WHERE (yr.category_revenue * 1.0 / tr.total_revenue_year) > 0.5
-ORDER BY yr.year, pct_of_year_total DESC;
+SELECT 
+    year,
+    category_name,
+    category_revenue,
+    total_revenue_year,
+    pct_of_year_total,
+    CASE 
+        WHEN pct_of_year_total > 50 THEN 'Yes'
+        ELSE 'No'
+    END AS exceeds_50_pct
+FROM ranked
+WHERE category_rank = 1
+ORDER BY year;
 ```
 ### 3️⃣ 2024 Print Efficiency Leaderboard
 ```sql
-WITH efficiency AS (
-  SELECT
-    dc.city AS city_name,
-    SUM(fps.copies_printed) FILTER (WHERE YEAR(fps.month_date) = 2024) AS copies_printed_2024,
-    SUM(fps.net_circulation) FILTER (WHERE YEAR(fps.month_date) = 2024) AS net_circulation_2024
-  FROM fact_print_sales fps
-  JOIN dim_city dc ON fps.city_id = dc.city_id
-  GROUP BY dc.city
+WITH city_totals_2024 AS (
+    SELECT 
+        f.city_id,
+        SUM(f.`Copies Sold` + f.copies_returned) AS copies_printed_2024,
+        SUM(f.net_circulation) AS net_circulation_2024
+    FROM fact_print_sales f
+    WHERE YEAR(f.month_date) = 2024
+    GROUP BY f.city_id
+),
+city_efficiency AS (
+    SELECT 
+        c.city,
+        t.copies_printed_2024,
+        t.net_circulation_2024,
+        ROUND(
+            (t.net_circulation_2024 * 1.0 / NULLIF(t.copies_printed_2024,0)), 4
+        ) AS efficiency_ratio
+    FROM city_totals_2024 t
+    JOIN dim_city c
+        ON t.city_id = c.city_id
+),
+ranked AS (
+    SELECT 
+        city,
+        copies_printed_2024,
+        net_circulation_2024,
+        efficiency_ratio,
+        RANK() OVER (ORDER BY efficiency_ratio DESC) AS efficiency_rank_2024
+    FROM city_efficiency
 )
-SELECT
-  city_name,
-  copies_printed_2024,
-  net_circulation_2024,
-  ROUND(net_circulation_2024 * 1.0 / copies_printed_2024, 3) AS efficiency_ratio,
-  RANK() OVER (ORDER BY net_circulation_2024 * 1.0 / copies_printed_2024 DESC) AS efficiency_rank_2024
-FROM efficiency
-ORDER BY efficiency_rank_2024
-LIMIT 5;
+SELECT 
+    city,
+    copies_printed_2024,
+    net_circulation_2024,
+    efficiency_ratio,
+    efficiency_rank_2024
+FROM ranked
+WHERE efficiency_rank_2024 <= 5
+ORDER BY efficiency_rank_2024;
 ```
 ### 4️⃣ Internet Readiness Growth (2021)
 ```sql
