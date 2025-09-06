@@ -1,29 +1,28 @@
-# Media Business SQL Requests  
+# Bharat Herald Survival Analysis
 
-This project contains SQL solutions for different business requests using datasets like:  
-- `fact_print_sales`  
-- `fact_ad_revenue`  
-- `fact_city_readiness`  
-- `fact_digital_pilot`  
-- `dim_city`  
-- `dim_ad_category`  
-
-All queries are written in **MySQL**.  
+### Author: Sai Abhilash  
+### Domain: Media & Publishing  
+### Function: Strategy & Data Analytics  
 
 ---
 
-## Business Request 1: Monthly Circulation Drop Check  
+## 📌 Problem Statement
+Bharat Herald, a 70-year-old legacy newspaper, is facing an existential crisis in the **post-COVID digital era**.  
+Between **2019–2024**, print circulation dropped from 1.2M to under 560K.  
+While competitors embraced **mobile-first, WhatsApp delivery, and subscription bundles**, Bharat Herald’s digital pilot failed.  
 
-**Requirement:**  
-Generate a report showing the top 3 months (2019–2024) where any city recorded the sharpest month-over-month decline in `net_circulation`.  
+This project analyzes **operational and financial data (2019–2024)** to:  
+- Quantify what went wrong  
+- Identify recovery opportunities  
+- Recommend a phased roadmap for digital transformation  
 
-**Fields:**  
-- city_name  
-- month (YYYY-MM)  
-- net_circulation  
+---
 
-**SQL Solution:**  
+## 📊 Business Requests & SQL Solutions
 
+---
+
+### 1️⃣ Biggest Monthly Net Circulation Drops
 ```sql
 WITH cs AS (
   SELECT
@@ -64,12 +63,3 @@ SELECT
 FROM city_drops
 ORDER BY drop_amount DESC
 LIMIT 3;
-
-## Business Request – 2: Yearly Revenue Concentration by Category 
-Identify ad categories that contributed > 50% of total yearly ad revenue. 
-Fields: 
-• year 
-• category_name 
-• category_revenue  
-• total_revenue_year  
-• pct_of_year_total
